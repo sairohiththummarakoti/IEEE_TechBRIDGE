@@ -1,5 +1,9 @@
 node_modules/
 dist/
+.next/
+out/
+.shots/
 .pnpm-store/
 tmp/
 *.log
+.env*.local
