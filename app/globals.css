@@ -449,21 +449,59 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .legend-mark { width: 16px; height: 16px; flex: none; overflow: visible; }
 
 .map-frame {
+  position: relative;
   overflow: hidden;
   border: 1px solid var(--navy-line);
   border-radius: 5px;
-  background: #0b1e33;
+  /* The landmass is a separately cached image (see scripts/generate-world-path.mjs)
+     rather than inline markup, and it is aligned to the dot layer by sharing an
+     aspect ratio and projection. */
+  background: #0b1e33 url('/world.svg') center / 100% 100% no-repeat;
 }
-.map-svg { display: block; width: 100%; height: auto; }
-.map-grid line { stroke: rgba(255, 255, 255, .05); stroke-width: 1; }
+.map-svg { position: relative; display: block; width: 100%; height: auto; }
+.map-grid line { stroke: rgba(255, 255, 255, .055); stroke-width: 1; }
+
+.city { transition: opacity .16s ease; }
+.map-frame.has-active .city:not(.is-active) { opacity: .38; }
+.dot-hit { fill: transparent; cursor: pointer; }
+.dot-halo { fill: none; stroke: rgba(255, 255, 255, .34); stroke-width: 1.2; }
 .dot-scheduled .dot-core { fill: var(--cyan-bright); filter: drop-shadow(0 0 7px rgba(76, 183, 231, .85)); }
 .dot-held .dot-core { fill: var(--amber); filter: drop-shadow(0 0 7px rgba(255, 185, 2, .55)); }
 .dot-held .dot-ring { fill: none; stroke: rgba(255, 255, 255, .55); stroke-width: 1.4; }
 .map-label {
   fill: #c2d3e2;
   font-family: var(--mono);
-  font-size: 13px;
-  letter-spacing: 1.6px;
+  font-size: 12px;
+  letter-spacing: 1.4px;
+  paint-order: stroke;
+  stroke: rgba(8, 24, 40, .85);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+
+.map-tooltip {
+  position: absolute;
+  z-index: 2;
+  padding: 9px 12px;
+  border: 1px solid #2c4763;
+  border-radius: 4px;
+  background: rgba(7, 21, 36, .97);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, .5);
+  pointer-events: none;
+  white-space: nowrap;
+  transform: translate(-50%, calc(-100% - 16px));
+}
+.map-tooltip.is-right { transform: translate(-88%, calc(-100% - 16px)); }
+.map-tooltip.is-left { transform: translate(-12%, calc(-100% - 16px)); }
+.map-tooltip strong { display: block; color: var(--white); font-size: .84rem; font-weight: 700; }
+.map-tooltip span {
+  display: block;
+  margin-top: 4px;
+  color: #8ea4b9;
+  font-family: var(--mono);
+  font-size: .58rem;
+  letter-spacing: .13em;
+  text-transform: uppercase;
 }
 
 .region-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 13px; margin-top: 24px; }

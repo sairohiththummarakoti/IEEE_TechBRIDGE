@@ -58,11 +58,30 @@ These are deliberate gaps, not oversights:
   event data is never maintained twice. `state` is `upcoming` or `past`; the design
   supplies no past events, so the Past filter shows an empty state rather than
   invented history.
-- `footprint.cities` carries `x` / `y` as percentages of the map frame, plus a
-  `status` of `held` or `scheduled`. Status differs by marker **shape** as well as
-  colour, and the full city list is exposed to screen readers as text.
+- `footprint.cities` carries real `lng` / `lat`, projected by
+  [lib/world-projection.js](lib/world-projection.js) onto the same
+  equirectangular frame as the landmass drawing. Hovering a dot shows the city,
+  region and status; status differs by marker **shape** as well as colour, and
+  the full city list is exposed to screen readers as text.
 - `partnerGroups`, `team` and `gallery` are plain arrays — add or remove entries
   without touching layout.
+
+## The world map
+
+`public/world.svg` is generated, not hand-drawn — run `pnpm run generate:map`
+([scripts/generate-world-path.mjs](scripts/generate-world-path.mjs)) to rebuild it
+from Natural Earth 110m data (public domain, via `world-atlas`). It ships as a
+separately cached image rather than inline markup because the path is ~49KB and
+purely decorative; inlining would put it in both the server HTML and the client
+bundle.
+
+The projection constants live in [lib/world-projection.js](lib/world-projection.js)
+and are read by both the generator and the dot layer. Change them in one place
+and regenerate, or the dots will drift off the coastlines.
+
+Note that the design reference has no landmasses at all — just a grid of dots.
+The map is an addition; if you want to match the reference exactly, drop the
+`background` image from `.map-frame`.
 
 ## Accessibility
 

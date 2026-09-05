@@ -19,6 +19,7 @@ import {
   footerColumns,
 } from '../lib/content.js';
 import { ArrowDown, ArrowRight, Eyebrow, ExternalIcon, Slot, SocietyLogo, StatusMarker, Wordmark } from './primitives.jsx';
+import WorldMap from './WorldMap.jsx';
 
 /* ---------------- 2. Hero ---------------- */
 
@@ -140,63 +141,6 @@ export function About() {
 }
 
 /* ---------------- 6. Global footprint ---------------- */
-
-const MAP_W = 1000;
-const MAP_H = 300;
-
-function WorldMap() {
-  const cols = 12;
-  const rows = 8;
-  return (
-    <div className="map-frame">
-      <svg viewBox={`0 0 ${MAP_W} ${MAP_H}`} className="map-svg" aria-hidden="true" focusable="false">
-        <g className="map-grid">
-          {Array.from({ length: cols - 1 }, (unused, i) => (
-            <line
-              key={`v${i}`}
-              x1={((i + 1) * MAP_W) / cols}
-              y1="0"
-              x2={((i + 1) * MAP_W) / cols}
-              y2={MAP_H}
-            />
-          ))}
-          {Array.from({ length: rows - 1 }, (unused, i) => (
-            <line
-              key={`h${i}`}
-              x1="0"
-              y1={((i + 1) * MAP_H) / rows}
-              x2={MAP_W}
-              y2={((i + 1) * MAP_H) / rows}
-            />
-          ))}
-        </g>
-        {footprint.cities.map((city) => {
-          const cx = (city.x / 100) * MAP_W;
-          const cy = (city.y / 100) * MAP_H;
-          return (
-            <g key={city.name}>
-              <StatusMarker status={city.status} cx={cx} cy={cy} />
-              {city.label ? (
-                <text className="map-label" x={cx + 15} y={cy + 4}>
-                  {city.name}
-                </text>
-              ) : null}
-            </g>
-          );
-        })}
-      </svg>
-
-      {/* The drawing is decorative; the same data is available to screen readers. */}
-      <ul className="sr-only">
-        {footprint.cities.map((city) => (
-          <li key={city.name}>
-            {city.name}, {city.region} — {city.status === 'held' ? 'Held' : 'Scheduled'}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
 
 export function Footprint() {
   return (
