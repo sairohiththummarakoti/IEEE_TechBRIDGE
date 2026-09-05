@@ -2,6 +2,7 @@
 
 import { useId, useRef, useState } from 'react';
 import { requestProgram, site } from '../lib/content.js';
+import { GOOGLE_SCRIPT_URL } from '../lib/site-config.js';
 import { Eyebrow } from './primitives.jsx';
 
 const FIELDS = [
@@ -31,15 +32,33 @@ function validate(values) {
 }
 
 /**
- * No backend is wired up yet. Point this at the platform's form endpoint (or an
- * approved form service) before collecting real submissions — until then the
- * success state below is a front-end demo only.
+ * Posts to a Google Apps Script Web App (see README.md, "Connecting the
+ * request form"). Content-Type is deliberately 'text/plain': Apps Script
+ * doesn't answer CORS preflight requests, so the body must qualify as a
+ * "simple request" (no preflight) — application/json here would silently
+ * fail every submission. The Apps Script side still parses it as JSON.
+ *
+ * With GOOGLE_SCRIPT_URL unset, submissions simulate success after a short
+ * delay so the form stays testable without a live endpoint.
  */
-async function submitRequest() {
-  await new Promise((resolve) => {
-    setTimeout(resolve, 700);
+async function submitRequest(payload) {
+  if (!GOOGLE_SCRIPT_URL) {
+    await new Promise((resolve) => {
+      setTimeout(resolve, 700);
+    });
+    return { ok: true };
+  }
+
+  const response = await fetch(GOOGLE_SCRIPT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(payload),
   });
-  return { ok: true };
+  const result = await response.json().catch(() => null);
+  if (!response.ok || !result?.ok) {
+    throw new Error(result?.error || `Request failed (${response.status})`);
+  }
+  return result;
 }
 
 export default function RequestProgram() {

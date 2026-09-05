@@ -26,6 +26,72 @@ To emit a plain static bundle instead (any web host, no Node process), uncomment
 `output: 'export'` in [next.config.mjs](next.config.mjs). Do that only once the
 request form posts to an external endpoint.
 
+## Connecting the request form
+
+The form posts to a Google Sheet through a Google Apps Script Web App. No
+Google Form is involved — Apps Script gives a real success/failure response
+and a spreadsheet of submissions, where a raw Google Form submission would be
+opaque (no response body) and tie you to that form's internal `entry.xxxxx`
+field IDs.
+
+1. Create a Google Sheet (any name).
+2. **Extensions > Apps Script.** Delete the placeholder `myFunction` code and
+   paste in [google-apps-script/Code.gs](google-apps-script/Code.gs).
+3. Optional — set `NOTIFY_EMAIL` near the top of the script to an inbox you
+   actually read, so you get an email per submission alongside the sheet row.
+   It defaults to off: the site's placeholder contact address
+   (`techbridge@computer.org`) is design-reference content, not a real
+   mailbox, so it is never used automatically.
+4. **Deploy > New deployment** > gear icon > **Web app**.
+   - Execute as: **Me**
+   - Who has access: **Anyone**
+5. Click Deploy, then **Authorize access** with your Google account. Google
+   will warn the script is unverified (expected, since you just wrote it) —
+   Advanced > Go to project (unsafe) > Allow.
+6. Copy the **Web app URL** (ends in `/exec`).
+7. Set it as `NEXT_PUBLIC_GOOGLE_SCRIPT_URL` — copy
+   [.env.local.example](.env.local.example) to `.env.local` for local dev, and
+   add the same key to your hosting provider's environment variables for
+   production.
+8. Rebuild. Submissions now land as rows in a `Submissions` sheet, with the
+   multi-select "Support needed" chips joined into one comma-separated cell.
+
+### Does this notify anyone?
+
+Not by default, and neither would a plain Sheet or Form:
+
+- A **bare Google Sheet** only notifies if you turn on `Tools > Notification
+  settings`, and even then the email just says the sheet changed — no
+  submission details — and fires on any edit, including ones you make
+  yourself.
+- A **plain Google Form** does have a built-in "email me for new responses"
+  toggle (Responses tab > ⋮), which is why it's tempting — but it ties you to
+  that form's own field IDs and gives no programmatic success/failure
+  response, which is why this setup uses Apps Script instead.
+- With `NOTIFY_EMAIL` set, `doPost` emails you the submission directly —
+  reliable, immediate, and scoped to actual form submissions only. A failed
+  send is logged and swallowed rather than failing the submission, since the
+  row is already saved by the time it runs.
+
+**Whenever you edit `Code.gs` after the first deploy**, you must push a new
+version — saving in the Apps Script editor does not update the live `/exec`
+URL. Use Deploy > Manage deployments > the pencil icon > New version.
+
+Leave `NEXT_PUBLIC_GOOGLE_SCRIPT_URL` unset during development and the form
+simulates a successful submission instead of calling out, so the UI stays
+testable offline.
+
+**Why the request uses `Content-Type: text/plain`:** Apps Script Web Apps
+don't answer CORS preflight (`OPTIONS`) requests. A POST with
+`Content-Type: application/json` triggers a preflight, which then hangs with
+no response — every submission fails silently. `text/plain` qualifies as a
+["simple request"](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS#simple_requests)
+and skips preflight entirely; the body is still a JSON string, and
+`JSON.parse(e.postData.contents)` on the Apps Script side reads it normally.
+This is handled already in `submitRequest()` in
+[components/RequestProgram.jsx](components/RequestProgram.jsx) — nothing to
+change there.
+
 ## Before launch
 
 These are deliberate gaps, not oversights:
