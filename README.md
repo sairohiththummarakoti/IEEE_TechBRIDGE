@@ -26,6 +26,36 @@ To emit a plain static bundle instead (any web host, no Node process), uncomment
 `output: 'export'` in [next.config.mjs](next.config.mjs). Do that only once the
 request form posts to an external endpoint.
 
+## Deploying to Vercel
+
+1. Push this repo to GitHub/GitLab/Bitbucket and import it in Vercel — the
+   Next.js framework preset is auto-detected, and `pnpm-lock.yaml` makes
+   Vercel use pnpm automatically. No `vercel.json` is needed.
+2. **Project Settings > Environment Variables**, add:
+   - `NEXT_PUBLIC_GOOGLE_SCRIPT_URL` — **required** for the request form to
+     actually submit anywhere. Without it, submissions in production now show
+     a visible error rather than a false success (see below) — the form
+     never silently swallows real requests.
+   - `NEXT_PUBLIC_SITE_URL` — optional. Without it, canonical URLs, Open
+     Graph tags and `sitemap.xml`/`robots.txt` automatically fall back to
+     Vercel's own deployment domain (`VERCEL_URL`, set automatically on every
+     build) rather than the local-dev placeholder. Set this once a custom
+     domain is attached, so metadata points at the real address instead of
+     `<project>.vercel.app`.
+   Add both under **Production**; add them under **Preview** too if you want
+   preview deployments to submit real test data to the same sheet (or point
+   Preview at a second Apps Script deployment / test sheet instead).
+3. Deploy. Build command, output directory and install command all use
+   Vercel's Next.js defaults — nothing to override.
+
+**Why a missing env var is safe now:** `submitRequest()` in
+[components/RequestProgram.jsx](components/RequestProgram.jsx) only
+simulates success when `NODE_ENV !== 'production'` (i.e. `next dev`). In a
+production build — Vercel or otherwise — a missing `GOOGLE_SCRIPT_URL` throws
+instead, and the form shows the same error state as any other failed
+submission. A forgotten or mis-scoped environment variable fails loudly
+instead of quietly losing every real request.
+
 ## Connecting the request form
 
 The form posts to a Google Sheet through a Google Apps Script Web App. No
@@ -96,13 +126,17 @@ change there.
 
 These are deliberate gaps, not oversights:
 
-- **`NEXT_PUBLIC_SITE_URL` is unset.** [lib/site-config.js](lib/site-config.js) falls
-  back to `https://techbridge.example.org`, which feeds the canonical tag, sitemap
-  and robots. Set the real origin or you will publish a wrong canonical URL.
-- **The request form has no backend.** `submitRequest` in
-  [components/RequestProgram.jsx](components/RequestProgram.jsx) resolves after a
-  short delay; the success panel is a front-end demo. Point it at an approved form
-  endpoint before collecting submissions, and add spam protection there.
+- **`NEXT_PUBLIC_SITE_URL` is unset.** On Vercel this is harmless — see
+  [lib/site-config.js](lib/site-config.js), which falls back to the
+  deployment's own `VERCEL_URL` automatically. Outside Vercel (or once a
+  custom domain is attached), set it explicitly or canonical/OG/sitemap fall
+  back further to an obviously-fake placeholder domain.
+- **The request form has no spam protection.** It posts to a Google Apps
+  Script Web App (see "Connecting the request form" below) — a real backend,
+  not a front-end demo — but the deployment is reachable by anyone who has
+  the URL, with no CAPTCHA or rate limiting. Add one (e.g. a honeypot field,
+  or gate the Apps Script endpoint) before treating this as launch-ready
+  against abuse.
 - **All content is placeholder.** Everything in [lib/content.js](lib/content.js) —
   statistics, cities, events, quotes, names, partner list, funding and review policy
   — comes from the design reference and is **not verified IEEE data**.
