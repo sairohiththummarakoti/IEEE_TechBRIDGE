@@ -38,15 +38,22 @@ function validate(values) {
  * "simple request" (no preflight) — application/json here would silently
  * fail every submission. The Apps Script side still parses it as JSON.
  *
- * With GOOGLE_SCRIPT_URL unset, submissions simulate success after a short
- * delay so the form stays testable without a live endpoint.
+ * With GOOGLE_SCRIPT_URL unset, submissions simulate success ONLY in
+ * development, so the UI stays testable without a live endpoint. In a
+ * production build this throws instead: a missing env var (forgotten,
+ * mistyped, or scoped to the wrong Vercel environment) must surface as a
+ * visible error, never as a false "request received" while real submissions
+ * silently go nowhere.
  */
 async function submitRequest(payload) {
   if (!GOOGLE_SCRIPT_URL) {
-    await new Promise((resolve) => {
-      setTimeout(resolve, 700);
-    });
-    return { ok: true };
+    if (process.env.NODE_ENV !== 'production') {
+      await new Promise((resolve) => {
+        setTimeout(resolve, 700);
+      });
+      return { ok: true };
+    }
+    throw new Error('The request form is not yet connected to a submission endpoint.');
   }
 
   const response = await fetch(GOOGLE_SCRIPT_URL, {
@@ -98,7 +105,12 @@ export default function RequestProgram() {
     try {
       await submitRequest({ ...values, support });
       setStatus('success');
-    } catch {
+    } catch (error) {
+      // The on-page copy stays generic and friendly for visitors; the real
+      // cause (e.g. a misconfigured or missing GOOGLE_SCRIPT_URL) still needs
+      // to be discoverable by whoever is checking the console, rather than
+      // silently indistinguishable from a real network blip.
+      console.error('TechBridge request form submission failed:', error);
       setStatus('error');
     }
   };
