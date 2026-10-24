@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { footprint } from '../lib/content.js';
 import { LAT_BOTTOM, LAT_TOP, WORLD_HEIGHT, WORLD_WIDTH, project } from '../lib/world-projection.js';
 import { StatusMarker } from './primitives.jsx';
 
@@ -22,7 +21,7 @@ function graticule() {
 
 const { meridians, parallels } = graticule();
 
-export default function WorldMap() {
+export default function WorldMap({ cities }) {
   const [active, setActive] = useState(null);
 
   // WCAG 1.4.13: content shown on hover must be dismissible without moving the
@@ -53,7 +52,7 @@ export default function WorldMap() {
           ))}
         </g>
 
-        {footprint.cities.map((city) => {
+        {cities.map((city) => {
           const [cx, cy] = project(city.lng, city.lat);
           const isActive = active?.name === city.name;
           return (
@@ -105,7 +104,7 @@ export default function WorldMap() {
 
       {/* The drawing is decorative; this is the accessible equivalent. */}
       <ul className="sr-only">
-        {footprint.cities.map((city) => (
+        {cities.map((city) => (
           <li key={city.name}>
             {city.name}, {city.region} — {city.status === 'held' ? 'Held' : 'Scheduled'}
           </li>

@@ -1,8 +1,9 @@
 'use client';
 
+import Link from 'next/link';
 import { useMemo, useState } from 'react';
-import { eventFilters, events } from '../lib/content.js';
-import { Eyebrow, Slot } from './primitives.jsx';
+import { eventFilters } from '../lib/content.js';
+import { ArrowRight, Eyebrow, Slot } from './primitives.jsx';
 
 function EventCard({ event }) {
   return (
@@ -16,19 +17,24 @@ function EventCard({ event }) {
         <p className="event-status">{event.status}</p>
       </div>
       <div className="event-body">
-        <h4>{event.href ? <a href={event.href}>{event.title}</a> : event.title}</h4>
+        <h4>{event.title}</h4>
         <p>{event.host}</p>
         <p className="event-attendees">{event.attendees}</p>
+        <Link className="event-link" href={`/events/${event.id}`}>
+          {event.state === 'upcoming' ? 'View details & register' : 'View details'} <ArrowRight />
+          <span className="sr-only">: {event.title}</span>
+        </Link>
       </div>
     </article>
   );
 }
 
-export default function Events() {
+/** `events` comes from getEvents(), so each one already carries its date-derived state. */
+export default function Events({ events }) {
   const [filter, setFilter] = useState('upcoming');
   const visible = useMemo(
     () => (filter === 'all' ? events : events.filter((event) => event.state === filter)),
-    [filter],
+    [events, filter],
   );
 
   return (
@@ -58,8 +64,7 @@ export default function Events() {
           visible.map((event) => <EventCard event={event} key={event.id} />)
         ) : (
           <p className="empty-state">
-            No past programs are listed yet. Choose &ldquo;Upcoming&rdquo; or &ldquo;All&rdquo; to see
-            scheduled programs.
+            No {filter === 'all' ? '' : `${filter} `}programs are listed yet.
           </p>
         )}
       </div>

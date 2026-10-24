@@ -4,20 +4,22 @@
  * Interactive sections live in their own 'use client' files.
  */
 import {
+  audiences,
   footprint,
   getInvolved,
   hero,
   mission,
   partnerGroups,
+  partners,
   site,
   stats,
   stories,
   team,
   vision,
   whatIs,
-  events,
   footerColumns,
 } from '../lib/content.js';
+import { getCities, getEvents } from '../lib/events.js';
 import { ArrowDown, ArrowRight, Eyebrow, ExternalIcon, Slot, SocietyLogo, StatusMarker, Wordmark } from './primitives.jsx';
 import WorldMap from './WorldMap.jsx';
 
@@ -86,6 +88,28 @@ export function Stats() {
         </dl>
       </div>
     </div>
+  );
+}
+
+/* ---------------- 3b. Find your way in ---------------- */
+
+export function Audiences() {
+  return (
+    <section className="section section-light audiences">
+      <h2 className="eyebrow">{audiences.eyebrow}</h2>
+      <ul className="audience-grid">
+        {audiences.items.map((item) => (
+          <li className="audience-card" key={item.id} data-reveal>
+            <p className="audience-who">{item.who}</p>
+            <h3>{item.title}</h3>
+            <p>{item.body}</p>
+            <a href={item.cta.href}>
+              {item.cta.label} <ArrowRight />
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
 
@@ -166,7 +190,7 @@ export function Footprint() {
         </ul>
       </div>
 
-      <WorldMap />
+      <WorldMap cities={getCities()} />
 
       <dl className="region-grid">
         {footprint.regions.map((region) => (
@@ -183,7 +207,7 @@ export function Footprint() {
 /* ---------------- 8. What's coming next ---------------- */
 
 export function Schedule() {
-  const upcoming = events.filter((event) => event.state === 'upcoming');
+  const upcoming = getEvents().filter((event) => event.state === 'upcoming');
   return (
     <section className="section schedule">
       <div className="section-head section-head-center">
@@ -242,8 +266,16 @@ export function Stories() {
 export function Partners() {
   return (
     <section className="section partners" id="partners">
-      <Eyebrow>Partners</Eyebrow>
-      <h2 className="display">Societies, industry, universities</h2>
+      <div className="section-head">
+        <div>
+          <Eyebrow>{partners.eyebrow}</Eyebrow>
+          <h2 className="display">{partners.heading}</h2>
+          <p className="lead">{partners.body}</p>
+        </div>
+        <a className="btn" href={partners.cta.href}>
+          {partners.cta.label}
+        </a>
+      </div>
       {partnerGroups.map((group) => (
         <div className="partner-group" key={group.id}>
           <h3 className="eyebrow">{group.heading}</h3>
@@ -338,11 +370,15 @@ export function Footer() {
         {footerColumns.map((column) => (
           <nav className="footer-column" key={column.heading} aria-label={column.heading}>
             <h2>{column.heading}</h2>
-            {column.links.map((link) => (
-              <a key={link.label} href={link.href}>
-                {link.label}
-              </a>
-            ))}
+            {column.links.map((link) =>
+              link.href ? (
+                <a key={link.label} href={link.href}>
+                  {link.label}
+                </a>
+              ) : (
+                <span key={link.label}>{link.label}</span>
+              ),
+            )}
           </nav>
         ))}
       </div>

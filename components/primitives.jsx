@@ -71,7 +71,7 @@ export function ExternalIcon() {
 
 export function Wordmark({ className = '' }) {
   return (
-    <a className={`wordmark ${className}`} href="#top">
+    <a className={`wordmark ${className}`} href="/#top">
       <span>{site.wordmark.lead}</span>
       <strong>{site.wordmark.accent}</strong>
     </a>
