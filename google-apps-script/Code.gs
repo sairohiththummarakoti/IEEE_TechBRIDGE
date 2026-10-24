@@ -1,7 +1,8 @@
 /**
- * Apps Script Web App backend for the TechBridge "Request a program" form.
+ * Apps Script Web App backend for the two TechBridge forms: "Request a
+ * program" on the homepage and the registration form on each event page.
  *
- * Setup (see README.md, "Connecting the request form"):
+ * Setup (see README.md, "Connecting the forms"):
  *   1. Create a Google Sheet.
  *   2. Extensions > Apps Script, delete the boilerplate, paste this file.
  *   3. Set NOTIFY_EMAIL below to your own inbox (optional — leave '' to skip).
@@ -14,18 +15,52 @@
  * New version — saving alone does not update the live /exec URL.
  */
 
-var SHEET_NAME = 'Submissions';
-var HEADERS = [
-  'Timestamp',
-  'Full name',
-  'Email',
-  'Institution / chapter',
-  'Country / IEEE region',
-  'Topic requested',
-  'Expected attendees',
-  'Support needed',
-  'Details',
-];
+/**
+ * `fields` pairs each column header with the payload key it is filled from, so
+ * the header row, the appended row and the notification email can never drift
+ * out of step with each other.
+ *
+ * Program requests all go in one tab. Registrations use the same form for
+ * every event but get one tab per event in this same spreadsheet, named
+ * `sheet` + the event's id (e.g. "Reg columbia-2026"); the tab is created the
+ * first time someone registers for that event.
+ */
+var FORMS = {
+  request: {
+    sheet: 'Submissions',
+    subject: 'TechBridge program request: ',
+    subjectKeys: ['chapter', 'name'],
+    fields: [
+      ['Full name', 'name'],
+      ['Email', 'email'],
+      ['Chapter / section', 'chapter'],
+      ['Country / IEEE region', 'region'],
+      ['Topic requested', 'topic'],
+      ['Expected attendees', 'attendees'],
+      ['Support needed', 'support'],
+      ['Details', 'details'],
+    ],
+  },
+  registration: {
+    sheet: 'Reg ',
+    perEvent: true,
+    subject: 'TechBridge event registration: ',
+    subjectKeys: ['eventTitle', 'name'],
+    fields: [
+      ['Event', 'eventTitle'],
+      ['Full name', 'name'],
+      ['Email', 'email'],
+      ['Phone', 'phone'],
+      ['IEEE member number', 'memberNumber'],
+      ['Company / organization', 'company'],
+      ['Job title', 'jobTitle'],
+      ['Years of experience', 'experience'],
+      ['City / country', 'city'],
+      ['Accessibility or dietary needs', 'needs'],
+      ['Consent given', 'consent'],
+    ],
+  },
+};
 
 /**
  * Set this to an inbox you actually read. Left blank, no email is sent and
@@ -42,22 +77,31 @@ var NOTIFY_EMAIL = '';
 function doPost(e) {
   try {
     var data = JSON.parse(e.postData.contents);
-    var sheet = getOrCreateSheet_();
+    // Payloads without a type predate the registration form: they are requests.
+    var form = FORMS[data.type || 'request'];
+    if (!form) {
+      return jsonResponse_({ ok: false, error: 'Unknown form type: ' + data.type });
+    }
 
-    sheet.appendRow([
-      new Date(),
-      data.name || '',
-      data.email || '',
-      data.institution || '',
-      data.region || '',
-      data.topic || '',
-      data.attendees || '',
-      (data.support || []).join(', '),
-      data.details || '',
-    ]);
+    var sheetName = form.sheet;
+    if (form.perEvent) {
+      // The id becomes part of a tab name and arrives from a public form, so
+      // only the characters an event slug can contain are accepted.
+      var eventId = String(data.eventId || '');
+      if (!/^[a-z0-9-]{1,60}$/.test(eventId)) {
+        return jsonResponse_({ ok: false, error: 'Missing or invalid event id.' });
+      }
+      sheetName += eventId;
+    }
+
+    var row = [new Date()];
+    form.fields.forEach(function (field) {
+      row.push(cell_(data[field[1]]));
+    });
+    getOrCreateSheet_(sheetName, form).appendRow(row);
 
     if (NOTIFY_EMAIL) {
-      notify_(data);
+      notify_(form, data);
     }
 
     return jsonResponse_({ ok: true });
@@ -66,20 +110,24 @@ function doPost(e) {
   }
 }
 
-function notify_(data) {
-  var subject = 'TechBridge program request: ' + (data.institution || data.name || 'new submission');
-  var body = [
-    'Full name: ' + (data.name || ''),
-    'Email: ' + (data.email || ''),
-    'Institution / chapter: ' + (data.institution || ''),
-    'Country / IEEE region: ' + (data.region || ''),
-    'Topic requested: ' + (data.topic || ''),
-    'Expected attendees: ' + (data.attendees || ''),
-    'Support needed: ' + (data.support || []).join(', '),
-    '',
-    'Details:',
-    data.details || '',
-  ].join('\n');
+function cell_(value) {
+  if (Array.isArray(value)) return value.join(', ');
+  if (value === true) return 'Yes';
+  if (value === false) return 'No';
+  return value || '';
+}
+
+function notify_(form, data) {
+  var named = '';
+  form.subjectKeys.forEach(function (key) {
+    if (!named && data[key]) named = data[key];
+  });
+  var subject = form.subject + (named || 'new submission');
+  var body = form.fields
+    .map(function (field) {
+      return field[0] + ': ' + cell_(data[field[1]]);
+    })
+    .join('\n');
 
   // Swallow mail errors so a quota hit or bad address never fails the
   // submission itself — the row is already saved by the time this runs.
@@ -90,12 +138,18 @@ function notify_(data) {
   }
 }
 
-function getOrCreateSheet_() {
+function getOrCreateSheet_(name, form) {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheetByName(SHEET_NAME);
+  var sheet = ss.getSheetByName(name);
   if (!sheet) {
-    sheet = ss.insertSheet(SHEET_NAME);
-    sheet.appendRow(HEADERS);
+    sheet = ss.insertSheet(name);
+    sheet.appendRow(
+      ['Timestamp'].concat(
+        form.fields.map(function (field) {
+          return field[0];
+        }),
+      ),
+    );
     sheet.setFrozenRows(1);
   }
   return sheet;

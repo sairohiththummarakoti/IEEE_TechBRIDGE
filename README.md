@@ -19,8 +19,12 @@ pnpm start
 
 Every route prerenders to static HTML, so the whole page — headings, events, team,
 stories, structured data — is in the initial response rather than assembled by
-client JavaScript. Only the header menu, event filter, gallery lightbox and request
-form ship as client components.
+client JavaScript. Only the header menu, event filter, gallery lightbox and the two
+forms ship as client components.
+
+There are two kinds of page: the homepage (`/`) and one detail-and-registration page
+per event (`/events/<id>`), generated from the `events` array in
+[lib/content.js](lib/content.js).
 
 To emit a plain static bundle instead (any web host, no Node process), uncomment
 `output: 'export'` in [next.config.mjs](next.config.mjs). Do that only once the
@@ -48,17 +52,27 @@ request form posts to an external endpoint.
 3. Deploy. Build command, output directory and install command all use
    Vercel's Next.js defaults — nothing to override.
 
-**Why a missing env var is safe now:** `submitRequest()` in
-[components/RequestProgram.jsx](components/RequestProgram.jsx) only
+**Why a missing env var is safe now:** `submitForm()` in
+[lib/submit-form.js](lib/submit-form.js) only
 simulates success when `NODE_ENV !== 'production'` (i.e. `next dev`). In a
 production build — Vercel or otherwise — a missing `GOOGLE_SCRIPT_URL` throws
 instead, and the form shows the same error state as any other failed
 submission. A forgotten or mis-scoped environment variable fails loudly
 instead of quietly losing every real request.
 
-## Connecting the request form
+## Connecting the forms
 
-The form posts to a Google Sheet through a Google Apps Script Web App. No
+Both forms — "Request a program" on the homepage and the registration form on
+each event page — post to the same Apps Script Web App. Each payload carries a
+`type` (`request` or `registration`). Requests all go in one tab,
+`Submissions`. Registrations use the same form for every event but get **one
+tab per event** in the same spreadsheet, named after the event's id (for
+example `Reg columbia-2026`) and created the first time someone registers for
+it. Renaming an event's `id` in `content.js` therefore starts a new tab. The
+script only records rows: it does not enforce an event's
+capacity, reject duplicate registrations or email the registrant.
+
+The forms post to a Google Sheet through a Google Apps Script Web App. No
 Google Form is involved — Apps Script gives a real success/failure response
 and a spreadsheet of submissions, where a raw Google Form submission would be
 opaque (no response body) and tie you to that form's internal `entry.xxxxx`
@@ -118,9 +132,8 @@ no response — every submission fails silently. `text/plain` qualifies as a
 ["simple request"](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS#simple_requests)
 and skips preflight entirely; the body is still a JSON string, and
 `JSON.parse(e.postData.contents)` on the Apps Script side reads it normally.
-This is handled already in `submitRequest()` in
-[components/RequestProgram.jsx](components/RequestProgram.jsx) — nothing to
-change there.
+This is handled already in `submitForm()` in
+[lib/submit-form.js](lib/submit-form.js) — nothing to change there.
 
 ## Before launch
 
@@ -131,8 +144,8 @@ These are deliberate gaps, not oversights:
   deployment's own `VERCEL_URL` automatically. Outside Vercel (or once a
   custom domain is attached), set it explicitly or canonical/OG/sitemap fall
   back further to an obviously-fake placeholder domain.
-- **The request form has no spam protection.** It posts to a Google Apps
-  Script Web App (see "Connecting the request form" below) — a real backend,
+- **The forms have no spam protection.** They post to a Google Apps
+  Script Web App (see "Connecting the forms" above) — a real backend,
   not a front-end demo — but the deployment is reachable by anyone who has
   the URL, with no CAPTCHA or rate limiting. Add one (e.g. a honeypot field,
   or gate the Apps Script endpoint) before treating this as launch-ready
@@ -143,10 +156,21 @@ These are deliberate gaps, not oversights:
 - **No photography.** Image slots render as labeled hatched frames. Supply `src` on
   any entry in `content.js` and the frame is replaced by the image. The one
   exception is the hero, which uses an existing workshop photo from `public/assets`;
-  its caption says `HOST INSTITUTION` rather than naming a venue, because that
-  photo is a stand-in.
+  its caption stays generic rather than naming a venue, because that photo is a
+  stand-in.
 - **No social or LinkedIn URLs.** Entries with `href: null` / `linkedin: null` render
-  as plain text instead of invented links.
+  as plain text instead of invented links. The same goes for the footer's
+  "Professional activities" link and the privacy policy named in the registration
+  consent line.
+- **Registration closes by date, on the site only.** An event is upcoming, with
+  registration open, through its `isoDate` and past from the next day (UTC); see
+  [lib/events.js](lib/events.js). Pages re-render hourly (`revalidate`), which
+  needs a Node host such as Vercel — with `output: 'export'` the state would be
+  frozen at build time. The Apps Script does not check dates, so a request sent
+  straight to the endpoint is still recorded after an event has closed.
+- **Only the Columbia event has detail copy.** The other three event pages show
+  date, location and capacity plus the registration form; fill in `format`, `cost`,
+  `about` and `highlights` in `content.js` when the real descriptions exist.
 - **Open Graph image** currently reuses the hero photo. Replace with a purpose-made
   1200×630 asset.
 
@@ -154,10 +178,12 @@ These are deliberate gaps, not oversights:
 
 [lib/content.js](lib/content.js) is the single source for every section. Of note:
 
-- `events` drives both the event cards and the "What's coming next" timeline, so
-  event data is never maintained twice. `state` is `upcoming` or `past`; the design
-  supplies no past events, so the Past filter shows an empty state rather than
-  invented history.
+- `events` drives the event cards, the "What's coming next" timeline and the
+  `/events/<id>` pages, so event data is never maintained twice. An event's `id`
+  is its URL slug. Read them through `getEvents()` in
+  [lib/events.js](lib/events.js), which adds the date-derived `state` and
+  `status`. `state` is `upcoming` or `past`, and an event moves from the
+  Upcoming filter to Past on its own the day after its date.
 - `footprint.cities` carries real `lng` / `lat`, projected by
   [lib/world-projection.js](lib/world-projection.js) onto the same
   equirectangular frame as the landmass drawing. Hovering a dot shows the city,

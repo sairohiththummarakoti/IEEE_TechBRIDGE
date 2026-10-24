@@ -2,19 +2,19 @@
 
 import { useId, useRef, useState } from 'react';
 import { requestProgram, site } from '../lib/content.js';
-import { GOOGLE_SCRIPT_URL } from '../lib/site-config.js';
+import { submitForm } from '../lib/submit-form.js';
 import { Eyebrow } from './primitives.jsx';
 
 const FIELDS = [
   { name: 'name', label: 'Full name', type: 'text', autoComplete: 'name' },
   { name: 'email', label: 'Email', type: 'email', autoComplete: 'email' },
-  { name: 'institution', label: 'Institution / chapter', type: 'text', autoComplete: 'organization' },
+  { name: 'chapter', label: 'Chapter / section', type: 'text', autoComplete: 'organization' },
   { name: 'region', label: 'Country / IEEE region', type: 'text', autoComplete: 'country-name' },
   { name: 'topic', label: 'Topic requested', type: 'text' },
   { name: 'attendees', label: 'Expected attendees', type: 'number', inputMode: 'numeric', min: 1 },
 ];
 
-const EMPTY = { name: '', email: '', institution: '', region: '', topic: '', attendees: '', details: '' };
+const EMPTY = { name: '', email: '', chapter: '', region: '', topic: '', attendees: '', details: '' };
 
 function validate(values) {
   const errors = {};
@@ -29,43 +29,6 @@ function validate(values) {
   }
   if (!values.details.trim()) errors.details = 'Tell us a little about the program you need.';
   return errors;
-}
-
-/**
- * Posts to a Google Apps Script Web App (see README.md, "Connecting the
- * request form"). Content-Type is deliberately 'text/plain': Apps Script
- * doesn't answer CORS preflight requests, so the body must qualify as a
- * "simple request" (no preflight) — application/json here would silently
- * fail every submission. The Apps Script side still parses it as JSON.
- *
- * With GOOGLE_SCRIPT_URL unset, submissions simulate success ONLY in
- * development, so the UI stays testable without a live endpoint. In a
- * production build this throws instead: a missing env var (forgotten,
- * mistyped, or scoped to the wrong Vercel environment) must surface as a
- * visible error, never as a false "request received" while real submissions
- * silently go nowhere.
- */
-async function submitRequest(payload) {
-  if (!GOOGLE_SCRIPT_URL) {
-    if (process.env.NODE_ENV !== 'production') {
-      await new Promise((resolve) => {
-        setTimeout(resolve, 700);
-      });
-      return { ok: true };
-    }
-    throw new Error('The request form is not yet connected to a submission endpoint.');
-  }
-
-  const response = await fetch(GOOGLE_SCRIPT_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify(payload),
-  });
-  const result = await response.json().catch(() => null);
-  if (!response.ok || !result?.ok) {
-    throw new Error(result?.error || `Request failed (${response.status})`);
-  }
-  return result;
 }
 
 export default function RequestProgram() {
@@ -103,7 +66,7 @@ export default function RequestProgram() {
     }
     setStatus('submitting');
     try {
-      await submitRequest({ ...values, support });
+      await submitForm({ type: 'request', ...values, support });
       setStatus('success');
     } catch (error) {
       // The on-page copy stays generic and friendly for visitors; the real

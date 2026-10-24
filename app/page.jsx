@@ -5,6 +5,7 @@ import RequestProgram from '../components/RequestProgram.jsx';
 import RevealOnScroll from '../components/RevealOnScroll.jsx';
 import {
   About,
+  Audiences,
   Footer,
   Footprint,
   GetInvolved,
@@ -16,7 +17,12 @@ import {
   Team,
 } from '../components/Sections.jsx';
 import { events, site } from '../lib/content.js';
+import { getEvents } from '../lib/events.js';
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from '../lib/site-config.js';
+
+// Upcoming/past and open/closed are derived from each event's date, so the
+// page is re-rendered hourly rather than frozen at build time.
+export const revalidate = 3600;
 
 /**
  * Structured data. Only facts that appear on the page are described here, and
@@ -74,9 +80,10 @@ export default function Page() {
       <main id="main">
         <Hero />
         <Stats />
+        <Audiences />
         <About />
         <Footprint />
-        <Events />
+        <Events events={getEvents()} />
         <Schedule />
         <Gallery />
         <Stories />

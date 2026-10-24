@@ -262,6 +262,8 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .nav-desktop { display: flex; align-items: center; gap: 30px; font-size: .9rem; font-weight: 600; }
 .nav-desktop > a:not(.btn) { color: #d5dfe9; transition: color .18s ease; }
 .nav-desktop > a:not(.btn):hover { color: var(--white); }
+.header-back { color: #d5dfe9; font-size: .9rem; font-weight: 600; transition: color .18s ease; }
+.header-back:hover { color: var(--white); }
 
 .nav-toggle {
   display: none;
@@ -382,6 +384,49 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   letter-spacing: .18em;
   text-transform: uppercase;
 }
+
+/* ==================================================================
+   3b. Find your way in
+   ================================================================== */
+
+.audiences { padding-top: 72px; padding-bottom: 0; }
+.audience-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.audience-card {
+  display: flex;
+  flex-direction: column;
+  padding: 26px 26px 24px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: var(--white);
+}
+.audience-who {
+  margin-bottom: 12px;
+  color: var(--blue);
+  font-family: var(--mono);
+  font-size: .62rem;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+}
+.audience-card h3 {
+  margin-bottom: 12px;
+  font-size: 1.32rem;
+  font-weight: 800;
+  letter-spacing: -.03em;
+  text-transform: uppercase;
+}
+.audience-card h3 + p { color: var(--muted); font-size: .9rem; line-height: 1.62; }
+.audience-card a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: 20px;
+  color: var(--blue);
+  font-size: .86rem;
+  font-weight: 700;
+}
+.audience-card a:hover { color: var(--blue-deep); }
+.audience-card a .icon { width: 14px; height: 14px; }
 
 /* ==================================================================
    4 + 5. Vision / mission, what is TechBridge
@@ -587,6 +632,17 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   letter-spacing: .15em;
   text-transform: uppercase;
 }
+.event-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 14px;
+  color: var(--blue);
+  font-size: .84rem;
+  font-weight: 700;
+}
+.event-link:hover { color: var(--blue-deep); }
+.event-link .icon { width: 14px; height: 14px; }
 
 /* ==================================================================
    8. Schedule
@@ -755,7 +811,9 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
    ================================================================== */
 
 .partners { background: var(--light-deep); }
-.partners .display { margin-bottom: 34px; }
+.partners .section-head { margin-bottom: 6px; }
+.partners .display { margin-bottom: 16px; }
+.partners .btn { flex: none; }
 .partner-group { margin-top: 28px; }
 .partner-group .eyebrow { margin-bottom: 12px; color: var(--muted); }
 .logo-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; }
@@ -954,7 +1012,7 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   letter-spacing: .17em;
   text-transform: uppercase;
 }
-.footer-column a { font-size: .87rem; transition: color .16s ease; }
+.footer-column a, .footer-column span { font-size: .87rem; transition: color .16s ease; }
 .footer-column a:hover { color: var(--white); }
 .footer-bottom {
   display: flex;
@@ -967,6 +1025,99 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 }
 .footer-bottom ul { display: flex; gap: 22px; }
 .footer-bottom a:hover { color: var(--white); }
+
+/* ==================================================================
+   16. Event page (/events/[id])
+   ================================================================== */
+
+.event-hero {
+  padding: 64px var(--gutter) 88px;
+  color: var(--white);
+  background: var(--navy);
+  background-image: radial-gradient(120% 90% at 8% 0%, var(--navy-lift) 0%, transparent 55%);
+}
+.event-hero h1 {
+  max-width: 11em;
+  font-size: clamp(2.5rem, 5.6vw, 4.6rem);
+  font-weight: 800;
+  line-height: .94;
+  letter-spacing: -.045em;
+  text-transform: uppercase;
+}
+.event-hero h1 + p { margin-top: 20px; color: #b9c8d7; font-size: 1.1rem; }
+
+.event-detail {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 48px;
+  padding: 48px var(--gutter) 96px;
+}
+.event-detail .empty-state { grid-column: auto; background: var(--white); }
+.event-info { display: grid; gap: 36px; }
+.event-facts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.event-fact {
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: var(--white);
+}
+.event-fact dt {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: .6rem;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+}
+.event-fact dd { margin-top: 7px; font-size: 1rem; font-weight: 700; line-height: 1.25; }
+.event-fact time { text-transform: uppercase; }
+.event-about { color: var(--ink-2); font-size: 1.06rem; line-height: 1.72; }
+.event-highlights li {
+  position: relative;
+  padding: 14px 0 14px 22px;
+  border-bottom: 1px solid var(--line);
+  font-size: .97rem;
+  font-weight: 500;
+}
+.event-highlights li::before {
+  position: absolute;
+  top: 1.35em; left: 0;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  content: '';
+  background: var(--cyan);
+}
+
+.register-card {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--white);
+  box-shadow: 0 26px 54px rgba(16, 45, 72, .12);
+  scroll-margin-top: 88px;
+}
+.register-head {
+  padding: 24px 28px;
+  color: var(--white);
+  background: linear-gradient(100deg, var(--blue) 0%, var(--cyan) 100%);
+}
+.register-head h2 { font-size: 1.5rem; font-weight: 800; letter-spacing: -.03em; text-transform: uppercase; }
+.register-head p { margin-top: 4px; font-size: .9rem; }
+.register-body { padding: 28px; }
+.register-fields { display: grid; gap: 18px; }
+.register-body .btn-block { margin-top: 18px; }
+.consent {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 10px;
+  margin-top: 20px;
+  color: var(--ink-2);
+  font-size: .84rem;
+  line-height: 1.5;
+}
+.consent input { width: 16px; height: 16px; margin: 3px 0 0; accent-color: var(--blue); }
+.consent .field-error { grid-column: 2; margin-top: 0; }
+.register-note { margin-top: 14px; color: var(--muted); font-size: .78rem; line-height: 1.5; text-align: center; }
 
 /* ==================================================================
    Responsive
@@ -1003,6 +1154,10 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   .stat { border-bottom: 1px solid rgba(255, 255, 255, .22); }
   .stat:nth-child(2) { border-right: 0; }
 
+  .audiences { padding-top: 56px; padding-bottom: 0; }
+  .audience-grid { grid-template-columns: 1fr; }
+  .event-hero { padding-block: 52px 64px; }
+  .event-detail { grid-template-columns: 1fr; gap: 40px; padding-block: 40px 72px; }
   .vision-mission, .what-is, .request { grid-template-columns: 1fr; gap: 44px; }
   .vision-mission { margin-bottom: 70px; }
   .mission { padding-left: 26px; }
@@ -1062,6 +1217,8 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   .team-grid { grid-template-columns: 1fr; }
   .involved-grid { grid-template-columns: 1fr; }
   .request-card { padding: 22px 18px; }
+  .register-head { padding: 20px 18px; }
+  .register-body { padding: 22px 18px; }
   .field-grid { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr; gap: 32px; }
   .footer-bottom { align-items: flex-start; flex-direction: column; gap: 14px; }

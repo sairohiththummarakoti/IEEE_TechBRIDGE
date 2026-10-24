@@ -1,10 +1,15 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { nav } from '../lib/content.js';
 import { SocietyLogo, Wordmark } from './primitives.jsx';
 
-export default function Header() {
+/**
+ * `back` swaps the section nav for a single link, for pages other than the
+ * homepage where the in-page anchors in `nav` have nothing to point at.
+ */
+export default function Header({ back = null }) {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -15,6 +20,23 @@ export default function Header() {
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
   }, [open]);
+
+  if (back) {
+    return (
+      <header className="site-header">
+        <div className="header-inner">
+          <div className="brand-group">
+            <Wordmark />
+            <span className="brand-rule" aria-hidden="true" />
+            <SocietyLogo />
+          </div>
+          <Link className="header-back" href={back.href}>
+            <span aria-hidden="true">←</span> {back.label}
+          </Link>
+        </div>
+      </header>
+    );
+  }
 
   return (
     <header className="site-header">
