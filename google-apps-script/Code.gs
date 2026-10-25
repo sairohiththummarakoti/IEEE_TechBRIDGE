@@ -30,6 +30,7 @@ var FORMS = {
     sheet: 'Submissions',
     subject: 'TechBridge program request: ',
     subjectKeys: ['chapter', 'name'],
+    required: ['name', 'email', 'chapter', 'region', 'topic', 'attendees', 'details'],
     fields: [
       ['Full name', 'name'],
       ['Email', 'email'],
@@ -46,6 +47,7 @@ var FORMS = {
     perEvent: true,
     subject: 'TechBridge event registration: ',
     subjectKeys: ['eventTitle', 'name'],
+    required: ['name', 'email', 'phone', 'company', 'jobTitle', 'experience', 'city', 'consent'],
     fields: [
       ['Event', 'eventTitle'],
       ['Full name', 'name'],
@@ -74,6 +76,64 @@ var FORMS = {
  */
 var NOTIFY_EMAIL = '';
 
+/**
+ * Spam limits. The honeypot and timing values come from the site (see
+ * components/SpamGuard.jsx); the rest is enforced here because bots often skip
+ * the site and post straight to this endpoint.
+ */
+var MIN_FILL_MS = 2500; // faster than this is a script, not a person
+var MAX_FIELD_LENGTH = 2000; // longer values are cut off
+var PER_EMAIL_LIMIT = 3; // submissions per email address...
+var PER_EMAIL_WINDOW_S = 600; // ...per 10 minutes, per form type
+var GLOBAL_LIMIT_PER_MIN = 60; // all submissions together
+
+/**
+ * Bot submissions get the same { ok: true } a person would, so a bot has no
+ * signal to adapt to; they just never reach the sheet.
+ */
+function looksLikeBot_(data) {
+  if (data.hp_field) return true;
+  var elapsed = Number(data.elapsedMs);
+  return !(elapsed >= MIN_FILL_MS);
+}
+
+/** Returns an error message for a person to see, or '' if the payload is fine. */
+function validate_(form, data) {
+  for (var i = 0; i < form.required.length; i++) {
+    var value = data[form.required[i]];
+    if (value === undefined || value === null || value === false || String(value).trim() === '') {
+      return 'Please fill in every required field.';
+    }
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(data.email).trim())) {
+    return 'Please enter a valid email address.';
+  }
+  return '';
+}
+
+/** Counts a submission and reports whether it is over either limit. */
+function overRateLimit_(type, email) {
+  var cache = CacheService.getScriptCache();
+  var minute = Math.floor(Date.now() / 60000);
+  var keys = ['rl:all:' + minute, 'rl:' + type + ':' + String(email).trim().toLowerCase().slice(0, 200)];
+  var limits = [GLOBAL_LIMIT_PER_MIN, PER_EMAIL_LIMIT];
+  var ttls = [120, PER_EMAIL_WINDOW_S];
+
+  var lock = LockService.getScriptLock();
+  lock.waitLock(5000);
+  try {
+    var over = false;
+    keys.forEach(function (key, i) {
+      var count = Number(cache.get(key) || 0) + 1;
+      if (count > limits[i]) over = true;
+      cache.put(key, String(count), ttls[i]);
+    });
+    return over;
+  } finally {
+    lock.releaseLock();
+  }
+}
+
 function doPost(e) {
   try {
     var data = JSON.parse(e.postData.contents);
@@ -81,6 +141,17 @@ function doPost(e) {
     var form = FORMS[data.type || 'request'];
     if (!form) {
       return jsonResponse_({ ok: false, error: 'Unknown form type: ' + data.type });
+    }
+
+    if (looksLikeBot_(data)) {
+      return jsonResponse_({ ok: true });
+    }
+    var invalid = validate_(form, data);
+    if (invalid) {
+      return jsonResponse_({ ok: false, error: invalid });
+    }
+    if (overRateLimit_(data.type || 'request', data.email)) {
+      return jsonResponse_({ ok: false, error: 'Too many submissions. Please try again in a few minutes.' });
     }
 
     var sheetName = form.sheet;
@@ -111,10 +182,14 @@ function doPost(e) {
 }
 
 function cell_(value) {
-  if (Array.isArray(value)) return value.join(', ');
+  if (Array.isArray(value)) value = value.join(', ');
   if (value === true) return 'Yes';
   if (value === false) return 'No';
-  return value || '';
+  var text = String(value === undefined || value === null ? '' : value).slice(0, MAX_FIELD_LENGTH);
+  // A cell starting with = + - or @ is run as a formula when the sheet is
+  // opened, so anyone filling in the form could plant one. The leading
+  // apostrophe makes Sheets store it as plain text instead.
+  return /^[=+\-@]/.test(text) ? "'" + text : text;
 }
 
 function notify_(form, data) {

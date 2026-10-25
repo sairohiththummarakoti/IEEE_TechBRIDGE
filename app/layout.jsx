@@ -30,7 +30,16 @@ export const metadata = {
     description: SITE_DESCRIPTION,
     images: ['/assets/techbridge-workshop-hero.png'],
   },
-  icons: { icon: '/favicon.svg' },
+  // The IEEE CS emblem cropped from public/assets/IEEE-CS_LogoTM-orange.png;
+  // the full lockup is unreadable at favicon size.
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: '16x16 32x32 48x48 64x64' },
+      { url: '/icon-192.png', type: 'image/png', sizes: '192x192' },
+      { url: '/icon-512.png', type: 'image/png', sizes: '512x512' },
+    ],
+    apple: { url: '/apple-touch-icon.png', sizes: '180x180' },
+  },
 };
 
 export const viewport = {

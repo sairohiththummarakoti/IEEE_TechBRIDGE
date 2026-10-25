@@ -4,6 +4,7 @@ import { useId, useRef, useState } from 'react';
 import { requestProgram, site } from '../lib/content.js';
 import { submitForm } from '../lib/submit-form.js';
 import { Eyebrow } from './primitives.jsx';
+import { Honeypot, useSpamGuard } from './SpamGuard.jsx';
 
 const FIELDS = [
   { name: 'name', label: 'Full name', type: 'text', autoComplete: 'name' },
@@ -39,6 +40,7 @@ export default function RequestProgram() {
   const [support, setSupport] = useState([]);
   const [status, setStatus] = useState('idle');
   const formRef = useRef(null);
+  const guard = useSpamGuard();
 
   const setField = (name, value) => {
     setValues((current) => {
@@ -66,7 +68,7 @@ export default function RequestProgram() {
     }
     setStatus('submitting');
     try {
-      await submitForm({ type: 'request', ...values, support });
+      await submitForm({ type: 'request', ...values, support, ...guard.fields() });
       setStatus('success');
     } catch (error) {
       // The on-page copy stays generic and friendly for visitors; the real
@@ -84,6 +86,7 @@ export default function RequestProgram() {
     setErrors({});
     setShowErrors(false);
     setStatus('idle');
+    guard.restart();
   };
 
   const errorFor = (name) => (showErrors ? errors[name] : undefined);
@@ -132,6 +135,7 @@ export default function RequestProgram() {
           </div>
         ) : (
           <form ref={formRef} onSubmit={onSubmit} noValidate>
+            <Honeypot trapRef={guard.trapRef} />
             <div className="field-grid">
               {FIELDS.map((field) => {
                 const message = errorFor(field.name);

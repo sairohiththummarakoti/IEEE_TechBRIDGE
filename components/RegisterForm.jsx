@@ -4,6 +4,7 @@ import { useEffect, useId, useRef, useState } from 'react';
 import { registration, site } from '../lib/content.js';
 import { isPast } from '../lib/events.js';
 import { submitForm } from '../lib/submit-form.js';
+import { Honeypot, useSpamGuard } from './SpamGuard.jsx';
 
 const FIELDS = [
   { name: 'name', label: 'Full name', type: 'text', autoComplete: 'name' },
@@ -58,6 +59,7 @@ export default function RegisterForm({ event }) {
   const [showErrors, setShowErrors] = useState(false);
   const [status, setStatus] = useState('idle');
   const formRef = useRef(null);
+  const guard = useSpamGuard();
 
   // The server only renders this form while registration is open, but that
   // HTML can be up to an hour old. Re-check in the browser so a page cached
@@ -87,7 +89,7 @@ export default function RegisterForm({ event }) {
     }
     setStatus('submitting');
     try {
-      await submitForm({ type: 'registration', eventId: event.id, eventTitle: event.title, ...values });
+      await submitForm({ type: 'registration', eventId: event.id, eventTitle: event.title, ...values, ...guard.fields() });
       setStatus('success');
     } catch (error) {
       // Same reasoning as the request form: friendly copy on the page, the
@@ -122,6 +124,7 @@ export default function RegisterForm({ event }) {
           </div>
         ) : (
           <form ref={formRef} onSubmit={onSubmit} noValidate>
+            <Honeypot trapRef={guard.trapRef} />
             <div className="register-fields">
               {FIELDS.map((field) => {
                 const message = errorFor(field.name);

@@ -144,7 +144,16 @@ These are deliberate gaps, not oversights:
   deployment's own `VERCEL_URL` automatically. Outside Vercel (or once a
   custom domain is attached), set it explicitly or canonical/OG/sitemap fall
   back further to an obviously-fake placeholder domain.
-- **The forms have no spam protection.** They post to a Google Apps
+- **Spam protection is basic.** Both forms carry a hidden honeypot field and
+  report how long the form was open ([components/SpamGuard.jsx](components/SpamGuard.jsx));
+  [Code.gs](google-apps-script/Code.gs) silently drops anything that fills the
+  honeypot or arrives in under 2.5 s, re-checks required fields and email format,
+  caps each email at 3 submissions per 10 minutes and all traffic at 60 per
+  minute, truncates long values, and stops cell values from being run as
+  formulas. That stops casual bots, but both signals are client-supplied, so a
+  bot written for this site gets past them. If spam does arrive, add Cloudflare
+  Turnstile: a site key on the forms and a secret-key check in `doPost` via
+  `UrlFetchApp`. Before that, the forms post to a Google Apps
   Script Web App (see "Connecting the forms" above) — a real backend,
   not a front-end demo — but the deployment is reachable by anyone who has
   the URL, with no CAPTCHA or rate limiting. Add one (e.g. a honeypot field,
@@ -218,6 +227,10 @@ honoured for the scroll reveals.
 
 ## Brand assets
 
-The IEEE Computer Society logo is used unmodified. Follow the official
+The IEEE Computer Society logo is used unmodified in the header and footer. The
+favicons in `public/` (`favicon.ico`, `icon-192.png`, `icon-512.png`,
+`apple-touch-icon.png`) are the orange emblem alone, cropped from that logo
+without the wordmark or "TM", because the full lockup is unreadable at 16–32px.
+Confirm with IEEE CS that the emblem may be used on its own this way. Follow the official
 [logo policy](https://www.computer.org/publications/logo-policy) and
 [brand guide](https://www.computer.org/about/ieee-computer-society-brand-guide).
