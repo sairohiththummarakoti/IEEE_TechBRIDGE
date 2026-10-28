@@ -33,7 +33,7 @@ var FORMS = {
     fields: [
       ['Full name', 'name'],
       ['Email', 'email'],
-      ['Chapter / section', 'chapter'],
+      ['Chapter / section / company', 'chapter'],
       ['Country / IEEE region', 'region'],
       ['Topic requested', 'topic'],
       ['Expected attendees', 'attendees'],
@@ -63,16 +63,14 @@ var FORMS = {
 };
 
 /**
- * Set this to an inbox you actually read. Left blank, no email is sent and
- * submissions are still recorded in the sheet — the site's contact address
- * (techbridge@computer.org) is placeholder content from the design reference,
- * not a real mailbox, so it is deliberately NOT used as a default here.
+ * Submission notifications go to Sai Rohit and Vinil. This does not send
+ * registration confirmation emails to participants; that feature is pending.
  *
  * MailApp's free daily quota (100/day on a personal Google account, more on
  * Workspace) is per Google account, not per script — plenty for a request
  * form, but worth knowing if this account sends other automated mail too.
  */
-var NOTIFY_EMAIL = '';
+var NOTIFY_EMAIL = 'sairohith.thummarakoti@ieee.org,vinil.pasupuleti@ieee.org';
 
 function doPost(e) {
   try {

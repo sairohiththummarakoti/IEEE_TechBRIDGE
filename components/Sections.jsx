@@ -15,6 +15,7 @@ import {
   stats,
   stories,
   team,
+  teamGroups,
   vision,
   whatIs,
   footerColumns,
@@ -53,7 +54,7 @@ export function Hero() {
         </div>
       </div>
 
-      <figure className="hero-media">
+      {hero.image.src ? <figure className="hero-media">
         <Slot
           label="Hero workshop photograph"
           src={hero.image.src}
@@ -66,7 +67,7 @@ export function Hero() {
             <span key={line}>{line}</span>
           ))}
         </figcaption>
-      </figure>
+      </figure> : <div className="hero-media launch-art" aria-hidden="true"><span>TECH<br />BRIDGE</span><p>Connecting communities.<br />Across every IEEE region.</p></div>}
     </section>
   );
 }
@@ -74,6 +75,7 @@ export function Hero() {
 /* ---------------- 3. Impact statistics ---------------- */
 
 export function Stats() {
+  if (!stats.length) return null;
   return (
     <div className="stats-band" id="impact">
       <div className="stats-inner">
@@ -168,7 +170,7 @@ export function About() {
 
 export function Footprint() {
   return (
-    <section className="section section-dark footprint angled">
+    <section className="section section-dark footprint angled" id="global">
       <div className="section-head">
         <div>
           <Eyebrow className="eyebrow-on-dark">{footprint.eyebrow}</Eyebrow>
@@ -195,7 +197,7 @@ export function Footprint() {
       <dl className="region-grid">
         {footprint.regions.map((region) => (
           <div className="region-card" key={region.label}>
-            <dd>{region.count}</dd>
+            {region.count ? <dd>{region.count}</dd> : null}
             <dt>{region.label}</dt>
           </div>
         ))}
@@ -238,6 +240,7 @@ export function Schedule() {
 /* ---------------- 10. Success stories ---------------- */
 
 export function Stories() {
+  if (!stories.length) return null;
   return (
     <section className="section section-light stories" id="stories">
       <Eyebrow>Success stories</Eyebrow>
@@ -301,32 +304,34 @@ export function Partners() {
 /* ---------------- 12. Team ---------------- */
 
 export function Team() {
+  if (!team.length) return null;
   return (
     <section className="section section-light team" id="team">
-      <Eyebrow>Committee</Eyebrow>
+      <Eyebrow>Digital Engagement &amp; Global Outreach</Eyebrow>
       <h2 className="display">Meet the team</h2>
+      <p className="lead">Supporting the Industry Engagement Committee's 2026–2027 initiatives through LinkedIn and digital content, the TechBRIDGE website, and the quarterly newsletter.</p>
+      {teamGroups.map((group) => <div className="team-group" key={group.id}>
+      <h3>{group.heading}</h3>
       <ul className="team-grid">
-        {team.map((person) => (
+        {group.members.map((person) => (
           <li className="team-card" key={person.id} data-reveal>
-            <Slot label="Portrait" src={person.portrait} alt="" ratio="4 / 3" />
+            {person.portrait ? <Slot label="Portrait" src={person.portrait} alt="" ratio="4 / 3" /> : null}
             <div className="team-copy">
-              <h3>{person.name}</h3>
+              <h4>{person.name}</h4>
               <p className="team-role">{person.role}</p>
+              {person.email ? <a href={`mailto:${person.email}`}>{person.email}</a> : null}
               {person.linkedin ? (
                 <a href={person.linkedin} target="_blank" rel="noreferrer">
                   LinkedIn <ExternalIcon />
                   <span className="sr-only">(opens in a new tab)</span>
                 </a>
-              ) : (
-                <span className="link-pending">
-                  LinkedIn <ExternalIcon />
-                  <span className="sr-only">— profile link not yet provided</span>
-                </span>
-              )}
+              ) : null}
             </div>
           </li>
         ))}
       </ul>
+      </div>)}
+      <p className="lead">Taieb Jemal and Vivian Chandran jointly coordinate the Video Production, Graphic Design, Content Writing, and Website teams.</p>
     </section>
   );
 }

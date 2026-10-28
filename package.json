@@ -5,22 +5,30 @@
   "scripts": {
     "dev": "next dev --port 3100",
     "build": "next build",
+    "build:cloudflare": "opennextjs-cloudflare build",
+    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
     "start": "next start",
     "lint": "next lint",
     "generate:map": "node scripts/generate-world-path.mjs"
   },
   "dependencies": {
-    "next": "15.5.4",
+    "@opennextjs/cloudflare": "1.20.14",
+    "next": "15.5.28",
     "react": "19.1.1",
     "react-dom": "19.1.1"
   },
   "devDependencies": {
     "d3-geo": "^3.1.1",
     "topojson-client": "^3.1.0",
-    "world-atlas": "^2.0.2"
+    "world-atlas": "^2.0.2",
+    "wrangler": "4.154.0"
   },
   "engines": {
-    "node": ">=18.18.0"
+    "node": ">=22"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild", "sharp", "workerd"]
   },
   "packageManager": "pnpm@10.18.2"
 }

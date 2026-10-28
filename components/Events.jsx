@@ -8,7 +8,7 @@ import { ArrowRight, Eyebrow, Slot } from './primitives.jsx';
 function EventCard({ event }) {
   return (
     <article className="event-card">
-      <Slot label="Event photo" src={event.image} alt="" ratio="16 / 10" />
+      {event.image ? <Slot label="Event photo" src={event.image} alt="" ratio="16 / 10" /> : null}
       <div className="event-band">
         <h3>{event.city}</h3>
         <p>

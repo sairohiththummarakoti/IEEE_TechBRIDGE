@@ -8,7 +8,7 @@ import { Eyebrow } from './primitives.jsx';
 const FIELDS = [
   { name: 'name', label: 'Full name', type: 'text', autoComplete: 'name' },
   { name: 'email', label: 'Email', type: 'email', autoComplete: 'email' },
-  { name: 'chapter', label: 'Chapter / section', type: 'text', autoComplete: 'organization' },
+  { name: 'chapter', label: 'Chapter / section / company', type: 'text', autoComplete: 'organization' },
   { name: 'region', label: 'Country / IEEE region', type: 'text', autoComplete: 'country-name' },
   { name: 'topic', label: 'Topic requested', type: 'text' },
   { name: 'attendees', label: 'Expected attendees', type: 'number', inputMode: 'numeric', min: 1 },
@@ -103,9 +103,9 @@ export default function RequestProgram() {
         </h2>
         <p>{requestProgram.body}</p>
         <hr />
-        <a className="request-email" href={`mailto:${site.contactEmail}`}>
+        {site.contactEmail ? <a className="request-email" href={`mailto:${site.contactEmail}`}>
           {site.contactEmail}
-        </a>
+        </a> : null}
         <ul className="request-social">
           {site.social.map((item) => (
             <li key={item.label}>
@@ -123,8 +123,7 @@ export default function RequestProgram() {
             </span>
             <h3>Request received</h3>
             <p>
-              Thank you. The TechBridge committee reviews requests twice a month and will follow up by
-              email.
+              Thank you. Your request has been recorded for the organizers.
             </p>
             <button type="button" className="btn btn-dark" onClick={reset}>
               Submit another request
@@ -204,8 +203,7 @@ export default function RequestProgram() {
               ) : null}
               {status === 'error' ? (
                 <p className="form-alert">
-                  Something went wrong sending your request. Please try again, or email{' '}
-                  {site.contactEmail}.
+                  Something went wrong sending your request. Please try again later.
                 </p>
               ) : null}
             </div>

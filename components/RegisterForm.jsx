@@ -189,8 +189,7 @@ export default function RegisterForm({ event }) {
               ) : null}
               {status === 'error' ? (
                 <p className="form-alert">
-                  Something went wrong sending your registration. Please try again, or email{' '}
-                  {site.contactEmail}.
+                  Something went wrong sending your registration. Please try again later.
                 </p>
               ) : null}
             </div>

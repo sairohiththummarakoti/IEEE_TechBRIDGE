@@ -44,6 +44,7 @@ export default async function EventPage({ params }) {
   const facts = [
     { label: 'Date', value: event.date },
     { label: 'Location', value: event.location },
+    { label: 'Venue', value: event.venue },
     { label: 'Capacity', value: event.capacity },
     { label: 'Cost', value: event.cost },
   ].filter((fact) => fact.value);
@@ -95,11 +96,11 @@ export default async function EventPage({ params }) {
               </section>
             ) : null}
 
-            <Slot label="Venue photo / map" src={event.venueImage} alt="" ratio="10 / 7" />
+            {event.venueImage ? <Slot label="Venue photo / map" src={event.venueImage} alt="" ratio="10 / 7" /> : null}
           </div>
 
           {isOpen ? (
-            <RegisterForm event={{ id: event.id, title: event.title, isoDate: event.isoDate }} />
+            <RegisterForm event={{ id: event.id, title: event.title, isoDate: event.isoDate, timeZone: event.timeZone }} />
           ) : (
             <p className="empty-state">{registration.closed}</p>
           )}

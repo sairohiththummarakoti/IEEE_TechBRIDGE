@@ -1,6 +1,5 @@
 import Header from '../components/Header.jsx';
 import Events from '../components/Events.jsx';
-import Gallery from '../components/Gallery.jsx';
 import RequestProgram from '../components/RequestProgram.jsx';
 import RevealOnScroll from '../components/RevealOnScroll.jsx';
 import {
@@ -85,7 +84,6 @@ export default function Page() {
         <Footprint />
         <Events events={getEvents()} />
         <Schedule />
-        <Gallery />
         <Stories />
         <Partners />
         <Team />
