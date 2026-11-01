@@ -5,15 +5,15 @@
   "scripts": {
     "dev": "next dev --port 3100",
     "build": "next build",
-    "build:cloudflare": "opennextjs-cloudflare build",
-    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
-    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
-    "start": "next start",
+    "test": "node --test tests/*.test.mjs",
+    "build:cloudflare": "next build",
+    "preview": "wrangler pages dev out",
+    "deploy": "next build && wrangler pages deploy out --project-name ieee-techbridge",
+    "start": "wrangler pages dev out",
     "lint": "next lint",
     "generate:map": "node scripts/generate-world-path.mjs"
   },
   "dependencies": {
-    "@opennextjs/cloudflare": "1.20.14",
     "next": "15.5.28",
     "react": "19.1.1",
     "react-dom": "19.1.1"
@@ -28,7 +28,11 @@
     "node": ">=22"
   },
   "pnpm": {
-    "onlyBuiltDependencies": ["esbuild", "sharp", "workerd"]
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "sharp",
+      "workerd"
+    ]
   },
   "packageManager": "pnpm@10.18.2"
 }

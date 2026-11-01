@@ -1,6 +1,6 @@
 # TechBridge - IEEE Computer Society global program
 
-Next.js website with a Cloudflare Workers deployment using OpenNext. Node.js 22 or later and pnpm 10.18.2 are required.
+Next.js website with a Cloudflare Pages static export (no R2). Node.js 22 or later and pnpm 10.18.2 are required.
 
 ## Local development
 
@@ -9,7 +9,7 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-Run `pnpm build` for the standard production build. See [CLOUDFLARE.md](CLOUDFLARE.md) for the Workers build and deployment.
+Run `pnpm build` for the standard production build. See [CLOUDFLARE.md](CLOUDFLARE.md) for the Pages build and deployment.
 
 ## Current content
 
@@ -25,7 +25,7 @@ See [LAUNCH-PENDING.md](LAUNCH-PENDING.md) for outstanding details and deferred 
 4. Set `NEXT_PUBLIC_GOOGLE_SCRIPT_URL` to that URL in Cloudflare's **build variables**, then rebuild. For local development, copy `.env.local.example` to `.env.local` and fill in the same value.
 5. Submit each form through the deployed site and verify the sheet row and organizer notifications.
 
-Program requests go to `Submissions`; registrations go to `Reg columbia-2026`. The backend currently records rows without enforcing capacity, registration dates or duplicates. Participant emails are not sent.
+Program requests go to `Submissions`; registrations go to `Reg columbia-2026`. The backend currently records rows without enforcing capacity or duplicates. The updated script rejects registrations after the event day in Columbia local time. Participant emails are not sent.
 
 After changing Apps Script, use **Deploy > Manage deployments > Edit > New version**. Saving alone does not update the live endpoint.
 

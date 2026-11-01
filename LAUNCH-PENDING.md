@@ -15,7 +15,7 @@
 
 ## Deployment setup still required
 
-- Cloudflare account access, repository connection, R2 enabled and cache bucket created.
+- Cloudflare account access and a Pages project connected to the repository. No R2 subscription is required.
 - Confirm `ieeetechbridge.com` remains the final domain and activate its Cloudflare zone.
   This domain remains configured from the earlier instruction.
 - Sai Rohit's Google account must own the registration spreadsheet; share it with
@@ -25,8 +25,7 @@
 - Fill `NEXT_PUBLIC_GOOGLE_SCRIPT_URL` with the `/exec` URL in Cloudflare build variables.
 - Complete a real browser submission for each existing form; verify the correct
   sheet tab and notifications to both organizers. Live integration is not verified here.
-- Complete the Workers build in Cloudflare's Linux environment or WSL. The local
-  Windows packaging attempt was blocked by symlink permissions.
+- Deploy the static `out/` build through Cloudflare Pages and check the live custom domain.
 
 ## Deferred functionality
 
@@ -35,9 +34,8 @@
 - Participant confirmation emails: not implemented. Current emails notify organizers only.
 - Four separate Volunteer, Speaker, Partner and Sponsor forms and their field definitions.
   Current interest links use the existing request form.
-- Registration deadline enforcement: current UI derives closure by UTC calendar date,
-  with hourly page revalidation. The backend does not enforce the deadline. Confirm
-  the closing timezone and add server enforcement before relying on it.
+- Redeploy the updated Apps Script so its event-day cutoff takes effect. Browser availability
+  refreshes after hydration; the backend enforces closure in America/New_York.
 - Duplicate-registration handling and spam protection.
 
 ## Content and decisions still needed

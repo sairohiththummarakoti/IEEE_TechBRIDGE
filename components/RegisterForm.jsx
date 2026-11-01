@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useId, useRef, useState } from 'react';
-import { registration, site } from '../lib/content.js';
+import { useId, useRef, useState } from 'react';
+import { registration } from '../lib/content.js';
+import { useEventClock } from '../lib/use-event-clock.js';
 import { isPast } from '../lib/events.js';
 import { submitForm } from '../lib/submit-form.js';
 
@@ -59,13 +60,9 @@ export default function RegisterForm({ event }) {
   const [status, setStatus] = useState('idle');
   const formRef = useRef(null);
 
-  // The server only renders this form while registration is open, but that
-  // HTML can be up to an hour old. Re-check in the browser so a page cached
-  // across the closing date doesn't keep taking registrations.
-  const [closed, setClosed] = useState(false);
-  useEffect(() => {
-    setClosed(isPast(event.isoDate));
-  }, [event.isoDate]);
+  const now = useEventClock();
+  const [deadlinePassed, setDeadlinePassed] = useState(false);
+  const closed = deadlinePassed || (now && isPast(event.isoDate, now, event.timeZone));
 
   const setField = (name, value) => {
     setValues((current) => {
@@ -77,6 +74,10 @@ export default function RegisterForm({ event }) {
 
   const onSubmit = async (submitEvent) => {
     submitEvent.preventDefault();
+    if (isPast(event.isoDate, new Date(), event.timeZone)) {
+      setDeadlinePassed(true);
+      return;
+    }
     const found = validate(values);
     setErrors(found);
     setShowErrors(true);
@@ -100,7 +101,7 @@ export default function RegisterForm({ event }) {
   const errorFor = (name) => (showErrors ? errors[name] : undefined);
   const errorCount = Object.keys(errors).length;
 
-  if (closed) return <p className="empty-state">{registration.closed}</p>;
+  if (closed && status !== 'success') return <p className="empty-state" role="status">{registration.closed}</p>;
 
   return (
     <div className="register-card" id="register">

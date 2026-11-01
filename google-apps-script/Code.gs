@@ -72,6 +72,25 @@ var FORMS = {
  */
 var NOTIFY_EMAIL = 'sairohith.thummarakoti@ieee.org,vinil.pasupuleti@ieee.org';
 
+// Trusted server configuration; never accept event dates from a browser.
+// Keep this in sync with lib/content.js and redeploy Apps Script after changes.
+var EVENTS = {
+  'columbia-2026': {
+    title: 'Tech Bridge Program',
+    date: '2026-11-07',
+    timeZone: 'America/New_York',
+  },
+};
+
+function registrationError_(eventId, now) {
+  if (!Object.prototype.hasOwnProperty.call(EVENTS, eventId)) return 'Unknown event.';
+  var event = EVENTS[eventId];
+  if (Utilities.formatDate(now, event.timeZone, 'yyyy-MM-dd') > event.date) {
+    return 'Registration for this event is closed.';
+  }
+  return '';
+}
+
 function doPost(e) {
   try {
     var data = JSON.parse(e.postData.contents);
@@ -89,6 +108,9 @@ function doPost(e) {
       if (!/^[a-z0-9-]{1,60}$/.test(eventId)) {
         return jsonResponse_({ ok: false, error: 'Missing or invalid event id.' });
       }
+      var registrationError = registrationError_(eventId, new Date());
+      if (registrationError) return jsonResponse_({ ok: false, error: registrationError });
+      data.eventTitle = EVENTS[eventId].title;
       sheetName += eventId;
     }
 

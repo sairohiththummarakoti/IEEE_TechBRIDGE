@@ -10,7 +10,6 @@ import {
   GetInvolved,
   Hero,
   Partners,
-  Schedule,
   Stats,
   Stories,
   Team,
@@ -19,15 +18,9 @@ import { events, site } from '../lib/content.js';
 import { getEvents } from '../lib/events.js';
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from '../lib/site-config.js';
 
-// Upcoming/past and open/closed are derived from each event's date, so the
-// page is re-rendered hourly rather than frozen at build time.
-export const revalidate = 3600;
+// Event status refreshes in the browser after static HTML loads.
 
-/**
- * Structured data. Only facts that appear on the page are described here, and
- * every event below is placeholder content from the design reference — remove
- * or replace the event list before search engines index real listings.
- */
+/** Structured data includes only the confirmed published event. */
 function structuredData() {
   return {
     '@context': 'https://schema.org',
@@ -83,7 +76,6 @@ export default function Page() {
         <About />
         <Footprint />
         <Events events={getEvents()} />
-        <Schedule />
         <Stories />
         <Partners />
         <Team />

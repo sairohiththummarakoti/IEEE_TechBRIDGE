@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { eventFilters } from '../lib/content.js';
+import { getEvents } from '../lib/events.js';
+import { useEventClock } from '../lib/use-event-clock.js';
 import { ArrowRight, Eyebrow, Slot } from './primitives.jsx';
 
 function EventCard({ event }) {
@@ -31,10 +33,12 @@ function EventCard({ event }) {
 
 /** `events` comes from getEvents(), so each one already carries its date-derived state. */
 export default function Events({ events }) {
+  const now = useEventClock();
+  const currentEvents = useMemo(() => now ? getEvents(now) : events, [now, events]);
   const [filter, setFilter] = useState('upcoming');
   const visible = useMemo(
-    () => (filter === 'all' ? events : events.filter((event) => event.state === filter)),
-    [events, filter],
+    () => (filter === 'all' ? currentEvents : currentEvents.filter((event) => event.state === filter)),
+    [currentEvents, filter],
   );
 
   return (

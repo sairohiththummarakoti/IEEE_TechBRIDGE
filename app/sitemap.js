@@ -1,5 +1,6 @@
 import { events } from '../lib/content.js';
 import { SITE_URL } from '../lib/site-config.js';
+export const dynamic = 'force-static';
 
 export default function sitemap() {
   return [

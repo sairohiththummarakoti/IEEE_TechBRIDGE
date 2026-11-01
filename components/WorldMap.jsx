@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { LAT_BOTTOM, LAT_TOP, WORLD_HEIGHT, WORLD_WIDTH, project } from '../lib/world-projection.js';
 import { StatusMarker } from './primitives.jsx';
+import { getCities } from '../lib/events.js';
+import { useEventClock } from '../lib/use-event-clock.js';
 
 const LON_STEP = 30;
 const LAT_STEP = 20;
@@ -21,7 +23,9 @@ function graticule() {
 
 const { meridians, parallels } = graticule();
 
-export default function WorldMap({ cities }) {
+export default function WorldMap({ cities: initialCities }) {
+  const now = useEventClock();
+  const cities = now ? getCities(now) : initialCities;
   const [active, setActive] = useState(null);
 
   // WCAG 1.4.13: content shown on hover must be dismissible without moving the

@@ -2,7 +2,8 @@
 const nextConfig = {
   reactStrictMode: true,
 
-  // Keep the server build: Cloudflare Workers runs hourly event revalidation.
+  output: 'export',
+  trailingSlash: true,
 };
 
 export default nextConfig;

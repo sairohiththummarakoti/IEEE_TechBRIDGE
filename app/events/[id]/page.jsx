@@ -2,15 +2,13 @@ import { notFound } from 'next/navigation';
 import Header from '../../../components/Header.jsx';
 import RegisterForm from '../../../components/RegisterForm.jsx';
 import { Eyebrow, Slot } from '../../../components/primitives.jsx';
-import { events, registration } from '../../../lib/content.js';
+import { events } from '../../../lib/content.js';
 import { getEvents } from '../../../lib/events.js';
 import { SITE_NAME } from '../../../lib/site-config.js';
 
 // Only the events in lib/content.js exist; anything else is a 404.
 export const dynamicParams = false;
 
-// Registration opens and closes by date, so re-render hourly (see lib/events.js).
-export const revalidate = 3600;
 
 export function generateStaticParams() {
   return events.map((event) => ({ id: event.id }));
@@ -48,7 +46,7 @@ export default async function EventPage({ params }) {
     { label: 'Capacity', value: event.capacity },
     { label: 'Cost', value: event.cost },
   ].filter((fact) => fact.value);
-  const isOpen = event.state === 'upcoming';
+
 
   return (
     <>
@@ -59,7 +57,7 @@ export default async function EventPage({ params }) {
       <main id="main">
         <section className="event-hero">
           <Eyebrow className="eyebrow-on-dark">
-            {[event.status, event.format].filter(Boolean).join(' · ')}
+            {event.date}
           </Eyebrow>
           <h1>{event.title}</h1>
           <p>Hosted by {event.host}</p>
@@ -99,11 +97,7 @@ export default async function EventPage({ params }) {
             {event.venueImage ? <Slot label="Venue photo / map" src={event.venueImage} alt="" ratio="10 / 7" /> : null}
           </div>
 
-          {isOpen ? (
-            <RegisterForm event={{ id: event.id, title: event.title, isoDate: event.isoDate, timeZone: event.timeZone }} />
-          ) : (
-            <p className="empty-state">{registration.closed}</p>
-          )}
+          <RegisterForm event={{ id: event.id, title: event.title, isoDate: event.isoDate, timeZone: event.timeZone }} />
         </div>
       </main>
     </>
