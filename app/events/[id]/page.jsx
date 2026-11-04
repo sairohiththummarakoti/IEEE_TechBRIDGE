@@ -41,6 +41,7 @@ export default async function EventPage({ params }) {
 
   const facts = [
     { label: 'Date', value: event.date },
+    { label: 'Time', value: event.timing },
     { label: 'Location', value: event.location },
     { label: 'Venue', value: event.venue },
     { label: 'Capacity', value: event.capacity },
@@ -80,6 +81,22 @@ export default async function EventPage({ params }) {
               <section>
                 <h2 className="eyebrow">About this event</h2>
                 <p className="event-about">{event.about}</p>
+              </section>
+            ) : null}
+
+            {event.agenda?.length > 0 ? (
+              <section aria-labelledby="agenda-heading">
+                <h2 className="eyebrow" id="agenda-heading">Agenda</h2>
+                <p className="agenda-timezone">All times are local to Columbia, South Carolina.</p>
+                <ol className="event-agenda">
+                  {event.agenda.map((session) => (
+                    <li key={session.time}>
+                      <p className="agenda-time">{session.time}</p>
+                      <h3>{session.title}</h3>
+                      <p>{session.description}</p>
+                    </li>
+                  ))}
+                </ol>
               </section>
             ) : null}
 

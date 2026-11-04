@@ -1072,6 +1072,12 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .event-fact dd { margin-top: 7px; font-size: 1rem; font-weight: 700; line-height: 1.25; }
 .event-fact time { text-transform: uppercase; }
 .event-about { color: var(--ink-2); font-size: 1.06rem; line-height: 1.72; }
+.agenda-timezone { color: var(--ink-2); margin-bottom: 16px; }
+.event-agenda { list-style: none; margin: 0; padding: 0; }
+.event-agenda li { padding: 22px 0; border-top: 1px solid var(--line, #dce3e9); }
+.event-agenda .agenda-time { color: var(--blue); font-weight: 700; margin-bottom: 8px; }
+.event-agenda h3 { font-size: 1.1rem; line-height: 1.4; margin-bottom: 10px; }
+.event-agenda li > p:last-child { color: var(--ink-2); line-height: 1.7; }
 .event-highlights li {
   position: relative;
   padding: 14px 0 14px 22px;

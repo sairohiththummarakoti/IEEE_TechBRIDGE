@@ -15,7 +15,7 @@
 
 ## Deployment setup still required
 
-- Cloudflare account access and a Pages project connected to the repository. No R2 subscription is required.
+- Cloudflare account access and a Workers project connected to the repository. No R2 subscription is required.
 - Confirm `ieeetechbridge.com` remains the final domain and activate its Cloudflare zone.
   This domain remains configured from the earlier instruction.
 - Sai Rohit's Google account must own the registration spreadsheet; share it with
@@ -25,7 +25,7 @@
 - Fill `NEXT_PUBLIC_GOOGLE_SCRIPT_URL` with the `/exec` URL in Cloudflare build variables.
 - Complete a real browser submission for each existing form; verify the correct
   sheet tab and notifications to both organizers. Live integration is not verified here.
-- Deploy the static `out/` build through Cloudflare Pages and check the live custom domain.
+- Deploy the static `out/` build through Cloudflare Workers Static Assets and check the live custom domain.
 
 ## Deferred functionality
 
@@ -41,7 +41,8 @@
 ## Content and decisions still needed
 
 - Confirmed capacity and waitlist promotion/cancellation rules.
-- Final venue/campus, start/end time and timezone, activities, fees, description and photos.
+- Final venue/campus, fees and photos. The supplied six-session agenda and
+  11:00 AM-4:00 PM timing are now included on the first event page.
 - Homepage image from VIVIN/media team and an approved social sharing image.
 - Full names for David and Caleb if desired, team role refinements, portraits and
   individual profile links. Only supplied names and roles are displayed.

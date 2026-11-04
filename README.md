@@ -1,6 +1,6 @@
 # TechBridge - IEEE Computer Society global program
 
-Next.js website with a Cloudflare Pages static export (no R2). Node.js 22 or later and pnpm 10.18.2 are required.
+Next.js website with a Cloudflare Workers Static Assets deployment (no R2). Node.js 22 or later and pnpm 10.18.2 are required.
 
 ## Local development
 
@@ -9,7 +9,7 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-Run `pnpm build` for the standard production build. See [CLOUDFLARE.md](CLOUDFLARE.md) for the Pages build and deployment.
+Run `pnpm build` for the standard production build. See [CLOUDFLARE.md](CLOUDFLARE.md) for the static asset build and deployment.
 
 ## Current content
 
