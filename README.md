@@ -20,7 +20,7 @@ See [LAUNCH-PENDING.md](LAUNCH-PENDING.md) for outstanding details and deferred 
 ## Connecting the forms
 
 1. Sign in with Sai Rohit's Google account (`sairohith.thummarakoti@ieee.org`) and create the registration spreadsheet. Share it with `vinil.pasupuleti@ieee.org` as an editor.
-2. Open **Extensions > Apps Script** and paste [google-apps-script/Code.gs](google-apps-script/Code.gs). Organizer notifications are configured for both supplied addresses.
+2. Open **Extensions > Apps Script** and paste [google-apps-script/Code.gs](google-apps-script/Code.gs). Select `configureSpreadsheet` in the editor's function dropdown and click **Run** once. This saves the Sheet ID for Web App requests; authorize access when prompted. Organizer notifications are configured for both supplied addresses.
 3. Choose **Deploy > New deployment > Web app**, execute as **Me**, and allow access to **Anyone**. Authorize spreadsheet and email access, then copy the Web App URL ending in `/exec`.
 4. Set `NEXT_PUBLIC_GOOGLE_SCRIPT_URL` to that URL in Cloudflare's **build variables**, then rebuild. For local development, copy `.env.local.example` to `.env.local` and fill in the same value.
 5. Submit each form through the deployed site and verify the sheet row and organizer notifications.

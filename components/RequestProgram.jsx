@@ -38,6 +38,7 @@ export default function RequestProgram() {
   const [showErrors, setShowErrors] = useState(false);
   const [support, setSupport] = useState([]);
   const [status, setStatus] = useState('idle');
+  const [submissionError, setSubmissionError] = useState('');
   const formRef = useRef(null);
 
   const setField = (name, value) => {
@@ -65,6 +66,7 @@ export default function RequestProgram() {
       return;
     }
     setStatus('submitting');
+    setSubmissionError('');
     try {
       await submitForm({ type: 'request', ...values, support });
       setStatus('success');
@@ -74,6 +76,8 @@ export default function RequestProgram() {
       // to be discoverable by whoever is checking the console, rather than
       // silently indistinguishable from a real network blip.
       console.error('TechBridge request form submission failed:', error);
+      setSubmissionError(error.message.includes('submission service is not configured')
+        ? error.message : 'Something went wrong sending your request. Please try again later.');
       setStatus('error');
     }
   };
@@ -203,7 +207,7 @@ export default function RequestProgram() {
               ) : null}
               {status === 'error' ? (
                 <p className="form-alert">
-                  Something went wrong sending your request. Please try again later.
+                  {submissionError}
                 </p>
               ) : null}
             </div>

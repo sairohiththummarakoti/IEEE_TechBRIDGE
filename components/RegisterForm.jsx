@@ -58,6 +58,7 @@ export default function RegisterForm({ event }) {
   const [errors, setErrors] = useState({});
   const [showErrors, setShowErrors] = useState(false);
   const [status, setStatus] = useState('idle');
+  const [submissionError, setSubmissionError] = useState('');
   const formRef = useRef(null);
 
   const now = useEventClock();
@@ -87,6 +88,7 @@ export default function RegisterForm({ event }) {
       return;
     }
     setStatus('submitting');
+    setSubmissionError('');
     try {
       await submitForm({ type: 'registration', eventId: event.id, eventTitle: event.title, ...values });
       setStatus('success');
@@ -94,6 +96,8 @@ export default function RegisterForm({ event }) {
       // Same reasoning as the request form: friendly copy on the page, the
       // real cause in the console for whoever is debugging the endpoint.
       console.error('TechBridge event registration failed:', error);
+      setSubmissionError(error.message.includes('submission service is not configured')
+        ? error.message : 'Something went wrong sending your registration. Please try again later.');
       setStatus('error');
     }
   };
@@ -190,7 +194,7 @@ export default function RegisterForm({ event }) {
               ) : null}
               {status === 'error' ? (
                 <p className="form-alert">
-                  Something went wrong sending your registration. Please try again later.
+                  {submissionError}
                 </p>
               ) : null}
             </div>

@@ -331,7 +331,7 @@ export function Team() {
         ))}
       </ul>
       </div>)}
-      <p className="lead">Taieb Jemal and Vivian Chandran jointly coordinate the Video Production, Graphic Design, Content Writing, and Website teams.</p>
+      <p className="lead">Taieb Jemal and Vivin Chandra Paasam jointly coordinate the Video Production, Graphic Design, Content Writing, and Website teams.</p>
     </section>
   );
 }

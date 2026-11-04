@@ -72,6 +72,21 @@ var FORMS = {
  */
 var NOTIFY_EMAIL = 'sairohith.thummarakoti@ieee.org,vinil.pasupuleti@ieee.org';
 
+// Run configureSpreadsheet once from the Sheet-bound Apps Script editor.
+// Web App requests open the saved ID instead of relying on an active Sheet.
+function configureSpreadsheet() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  if (!ss) throw new Error('Open Apps Script from the registration Sheet to run this setup.');
+  PropertiesService.getScriptProperties().setProperty('SPREADSHEET_ID', ss.getId());
+  Logger.log('Registration spreadsheet configured.');
+}
+
+function submissionSpreadsheet_() {
+  var id = PropertiesService.getScriptProperties().getProperty('SPREADSHEET_ID');
+  if (!id) throw new Error('Run configureSpreadsheet from the Sheet-bound script editor before deploying.');
+  return SpreadsheetApp.openById(id);
+}
+
 // Trusted server configuration; never accept event dates from a browser.
 // Keep this in sync with lib/content.js and redeploy Apps Script after changes.
 var EVENTS = {
@@ -159,7 +174,7 @@ function notify_(form, data) {
 }
 
 function getOrCreateSheet_(name, form) {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var ss = submissionSpreadsheet_();
   var sheet = ss.getSheetByName(name);
   if (!sheet) {
     sheet = ss.insertSheet(name);
