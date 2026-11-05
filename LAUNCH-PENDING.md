@@ -2,8 +2,8 @@
 
 ## Included now
 
-- One confirmed event: Tech Bridge Program, November 7, 2026, Columbia, South Carolina.
-- Exact venue, program details, fees and capacity are not advertised as confirmed.
+- One confirmed event: TechX, November 20, 2026, University of South Carolina, Columbia, SC, USA.
+- Program details, fees and capacity are not advertised as confirmed.
 - IEEE Computer Society / Columbia participation only; Charlotte is not listed.
 - Global reach across all IEEE regions, with only Columbia marked on the map.
 - No placeholder statistics, testimonials, previous-event gallery or sponsor logos.
@@ -41,7 +41,7 @@
 ## Content and decisions still needed
 
 - Confirmed capacity and waitlist promotion/cancellation rules.
-- Final venue/campus, fees and photos. The supplied six-session agenda and
+- Fees and photos. The supplied six-session agenda and
   11:00 AM-4:00 PM timing are now included on the first event page.
 - Homepage image from VIVIN/media team and an approved social sharing image.
 - Full names for David and Caleb if desired, team role refinements, portraits and

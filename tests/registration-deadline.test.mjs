@@ -35,22 +35,22 @@ function backend(now) {
 }
 
 test('Columbia registration stays open through the event day, including after UTC midnight', () => {
-  for (const timestamp of ['2026-11-07T23:59:59Z', '2026-11-08T04:59:59Z']) {
+  for (const timestamp of ['2026-11-20T23:59:59Z', '2026-11-21T04:59:59Z']) {
     const now = new Date(timestamp);
-    assert.equal(isPast('2026-11-07', now, 'America/New_York'), false);
+    assert.equal(isPast('2026-11-20', now, 'America/New_York'), false);
     assert.equal(getEvents(now)[0].state, 'upcoming');
     const { context, writes } = backend(timestamp);
     assert.equal(context.doPost({ postData: { contents: JSON.stringify({
       type: 'registration', eventId: 'columbia-2026', eventTitle: 'Untrusted title',
     }) } }).ok, true);
     assert.equal(writes.length, 1);
-    assert.equal(writes[0][1], 'Tech Bridge Program');
+    assert.equal(writes[0][1], 'TechX');
   }
 });
 
 test('local midnight closes browser state and backend before any row is written', () => {
-  const timestamp = '2026-11-08T05:00:00Z';
-  assert.equal(isPast('2026-11-07', new Date(timestamp), 'America/New_York'), true);
+  const timestamp = '2026-11-21T05:00:00Z';
+  assert.equal(isPast('2026-11-20', new Date(timestamp), 'America/New_York'), true);
   assert.equal(getEvents(new Date(timestamp))[0].state, 'past');
   const { context, writes } = backend(timestamp);
   const result = context.doPost({ postData: { contents: JSON.stringify({

@@ -91,8 +91,8 @@ function submissionSpreadsheet_() {
 // Keep this in sync with lib/content.js and redeploy Apps Script after changes.
 var EVENTS = {
   'columbia-2026': {
-    title: 'Tech Bridge Program',
-    date: '2026-11-07',
+    title: 'TechX',
+    date: '2026-11-20',
     timeZone: 'America/New_York',
   },
 };

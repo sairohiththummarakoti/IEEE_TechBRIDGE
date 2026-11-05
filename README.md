@@ -13,7 +13,7 @@ Run `pnpm build` for the standard production build. See [CLOUDFLARE.md](CLOUDFLA
 
 ## Current content
 
-Only the confirmed November 7, 2026 Tech Bridge Program in Columbia is published. Supplied team names, structure and LinkedIn pages are included. Unverified statistics, testimonials, photographs and partnerships are hidden. Content lives in [lib/content.js](lib/content.js).
+Only the confirmed November 20, 2026 TechX event at the University of South Carolina, Columbia, SC, USA is published. Supplied team names, structure and LinkedIn pages are included. Unverified statistics, testimonials, photographs and partnerships are hidden. Content lives in [lib/content.js](lib/content.js).
 
 See [LAUNCH-PENDING.md](LAUNCH-PENDING.md) for outstanding details and deferred features. Capacity handling, waitlists, participant confirmation emails and four separate interest forms remain deferred.
 

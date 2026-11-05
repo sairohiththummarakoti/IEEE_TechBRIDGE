@@ -43,7 +43,7 @@ pnpm preview
 
 ## Date behavior
 
-Initial HTML, metadata and content are generated at build time. Date-based event status refreshes in the browser after hydration, every minute and when a tab becomes visible. Registration is checked again on submit. Apps Script separately enforces closure after November 7, 2026 in America/New_York once the updated script is deployed.
+Initial HTML, metadata and content are generated at build time. Date-based event status refreshes in the browser after hydration, every minute and when a tab becomes visible. Registration is checked again on submit. Apps Script separately enforces closure after November 20, 2026 in America/New_York once the updated script is deployed.
 Content edits need a rebuild. Rebuild after the event to refresh initial HTML for crawlers and visitors without JavaScript. Capacity, waitlists, participant confirmation emails and separate interest forms remain deferred.
 
 Official reference: [Workers Static Assets](https://developers.cloudflare.com/workers/static-assets/get-started/).
